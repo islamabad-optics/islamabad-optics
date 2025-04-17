@@ -3,14 +3,12 @@ import react from '@vitejs/plugin-react';
 import jsconfigPaths from 'vite-jsconfig-paths';
 
 export default defineConfig(({ mode }) => {
-  // const env = loadEnv(mode, process.cwd(), '');
-  // const API_URL = `${env.VITE_APP_BASE_NAME}`;
-  const PORT = 3000;
+  const env = loadEnv(mode, process.cwd(), '');
 
   return {
     server: {
       open: true,
-      port: PORT,
+      port: 3000,
       host: true
     },
     preview: {
@@ -23,7 +21,7 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: []
     },
-    base: './', // ✅ this is the fix
+    base: env.VITE_APP_BASE_NAME || './', // 👈 automatically uses "/free" in production, "./" in dev
     plugins: [react(), jsconfigPaths()]
   };
 });
