@@ -1,15 +1,4 @@
-import { Link } from 'react-router-dom';
-
-// material-ui
-import Grid from '@mui/material/Grid2';
-import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
-
-// project imports
-import AuthWrapper from 'sections/auth/AuthWrapper';
-import FirebaseRegister from 'sections/auth/AuthRegister';
-
-// ================================|| JWT - REGISTER ||================================ //
+import AppwriteRegister from './AppwriteRegister';
 
 export default function Register() {
   return (
@@ -24,7 +13,7 @@ export default function Register() {
           </Stack>
         </Grid>
         <Grid size={12}>
-          <FirebaseRegister />
+          <AppwriteRegister />
         </Grid>
       </Grid>
     </AuthWrapper>

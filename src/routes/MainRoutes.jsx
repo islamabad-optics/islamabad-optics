@@ -1,54 +1,34 @@
 import { lazy } from 'react';
-
-// project imports
 import Loadable from 'components/Loadable';
 import DashboardLayout from 'layout/Dashboard';
+import ProtectedRoute from './ProtectedRoute'; // ✅ Import this
 
-// render- Dashboard
 const DashboardDefault = Loadable(lazy(() => import('pages/dashboard/default')));
-
-// render - color
-const Color = Loadable(lazy(() => import('pages/component-overview/color')));
-const Typography = Loadable(lazy(() => import('pages/component-overview/typography')));
-const Shadow = Loadable(lazy(() => import('pages/component-overview/shadows')));
-
-// render - sample page
-const SamplePage = Loadable(lazy(() => import('pages/extra-pages/sample-page')));
+const Customers = Loadable(lazy(() => import('pages/dashboard/customers')));
+const Sales = Loadable(lazy(() => import('pages/dashboard/sales')));
+const Inventory = Loadable(lazy(() => import('pages/dashboard/inventory')));
+const Workers = Loadable(lazy(() => import('pages/dashboard/workers')));
 
 // ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = {
   path: '/',
-  element: <DashboardLayout />,
+  element: <ProtectedRoute />,
   children: [
     {
       path: '/',
-      element: <DashboardDefault />
-    },
-    {
-      path: 'dashboard',
+      element: <DashboardLayout />,
       children: [
+        { path: '/', element: <DashboardDefault /> },
         {
-          path: 'default',
-          element: <DashboardDefault />
-        }
+          path: 'dashboard',
+          children: [{ path: 'default', element: <DashboardDefault /> }]
+        },
+        { path: 'customers', element: <Customers /> },
+        { path: 'sales', element: <Sales /> },
+        { path: 'inventory', element: <Inventory /> },
+        { path: 'workers', element: <Workers /> },
       ]
-    },
-    {
-      path: 'typography',
-      element: <Typography />
-    },
-    {
-      path: 'color',
-      element: <Color />
-    },
-    {
-      path: 'shadow',
-      element: <Shadow />
-    },
-    {
-      path: 'sample-page',
-      element: <SamplePage />
     }
   ]
 };
