@@ -21,7 +21,7 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: []
     },
-    base: env.VITE_APP_BASE_NAME || './', // 👈 automatically uses "/free" in production, "./" in dev
+    base: '/free/', // for subfolder deployments like yoursite.com/free/
     plugins: [react(), jsconfigPaths()]
   };
 });
