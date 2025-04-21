@@ -1,9 +1,8 @@
 {
-    "redirects": [
-      { "source": "/", "destination": "/free", "permanent": true }
-    ],
-    "rewrites": [
-      { "source": "/free/**", "destination": "/free/index.html" }
-    ]
-  }
-  
+  "routes": [
+    {
+      "src": "/[^.]+",
+      "dest": "/index.html"
+    }
+  ]
+}

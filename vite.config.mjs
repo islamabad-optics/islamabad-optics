@@ -21,7 +21,7 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: []
     },
-    base: '/free/', // for subfolder deployments like yoursite.com/free/
+    base: '/',
     plugins: [react(), jsconfigPaths()]
   };
 });
