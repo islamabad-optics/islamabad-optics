@@ -35,9 +35,11 @@
     "@mui/system": "6.4.1",
     "@mui/x-charts": "7.24.1",
     "@mui/x-date-pickers": "^7.28.3",
+    "@react-pdf/renderer": "^4.3.0",
     "@vitejs/plugin-react": "4.3.4",
     "appwrite": "^17.0.1",
     "dayjs": "^1.11.13",
+    "file-saver": "^2.0.5",
     "formik": "2.4.6",
     "framer-motion": "^12.6.5",
     "lodash-es": "4.17.21",
@@ -53,6 +55,7 @@
     "vite": "6.0.11",
     "vite-jsconfig-paths": "2.0.1",
     "web-vitals": "4.2.4",
+    "xlsx": "^0.18.5",
     "yup": "1.6.1"
   },
   "eslintConfig": {

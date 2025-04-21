@@ -49,14 +49,7 @@ const dashboard = {
       icon: icons.StockOutlined,
       breadcrumbs: false
     },
-    {
-      id: 'workers',
-      title: 'Workers',
-      type: 'item',
-      url: '/workers',
-      icon: icons.UserOutlined,
-      breadcrumbs: false
-    }
+
   ]
 };
 

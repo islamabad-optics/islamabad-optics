@@ -1,4 +1,4 @@
-import { Client, Account, Databases, ID } from 'appwrite';
+import { Client, Account, Databases, ID,Query } from 'appwrite';
 
 const client = new Client();
 
@@ -8,7 +8,7 @@ client
 
 export const account = new Account(client);
 export const databases = new Databases(client);
-export { ID }; // ✅ Correct way to export ID (it's not created with `new`, just exported)
+export { ID,Query }; // ✅ Correct way to export ID (it's not created with `new`, just exported)
 
 export async function getCurrentUser() {
   try {

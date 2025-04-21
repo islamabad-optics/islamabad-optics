@@ -27,7 +27,6 @@ const MainRoutes = {
         { path: 'customers', element: <Customers /> },
         { path: 'sales', element: <Sales /> },
         { path: 'inventory', element: <Inventory /> },
-        { path: 'workers', element: <Workers /> },
       ]
     }
   ]

@@ -1,4 +1,4 @@
-// This version integrates Appwrite for full CRUD (Create, Read, Update, Delete)
+// This version integrates Appwrite for full CRUD (Create, Read, Update, Delete) with PDF Print functionality
 // It replaces the local state dummy data and functions
 
 import * as React from 'react';
@@ -11,6 +11,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
 import { ID, Query } from 'appwrite';
 import { databases } from '../../utils/appwrite'; // Adjust this path as needed
+import PrintModal from '../component-overview/PrintModal';
 
 const DATABASE_ID = '67fe47260000f251de8f';
 const COLLECTION_ID = '67ff759700363e63d767';
@@ -42,6 +43,7 @@ export default function OrdersDetailedTable() {
   const [open, setOpen] = React.useState(false);
   const [form, setForm] = React.useState(initialForm);
   const [editId, setEditId] = React.useState(null);
+  const [printData, setPrintData] = React.useState(null);
 
   const fetchOrders = async () => {
     try {
@@ -118,6 +120,10 @@ export default function OrdersDetailedTable() {
     }
   };
 
+  const handlePrint = (order) => {
+    setPrintData(order);
+  };
+
   return (
     <Box sx={{ width: '100%', p: 2 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
@@ -162,12 +168,14 @@ export default function OrdersDetailedTable() {
                 <TableCell>{order.delivery_date}</TableCell>
                 <TableCell>{order.complete ? '✅' : '❌'}</TableCell>
                 <TableCell>
-                  <Button size="small" onClick={() => handleEdit(order)}>Edit</Button>
-                  <Button size="small" color="error" onClick={() => handleDelete(order.$id)}>Delete</Button>
-                  <Button size="small" color="secondary" onClick={() => toggleComplete(order)}>
-                    {order.complete ? 'Undo' : 'Complete'}
-                  </Button>
-                </TableCell>
+  <Button size="small" onClick={() => handleEdit(order)}>Edit</Button>
+  <Button size="small" color="error" onClick={() => handleDelete(order.$id)}>Delete</Button>
+  <Button size="small" color="secondary" onClick={() => toggleComplete(order)}>
+    {order.complete ? 'Undo' : 'Complete'}
+  </Button>
+  <Button size="small" onClick={() => handlePrint(order)}>Print</Button>
+</TableCell>
+
               </TableRow>
             ))}
           </TableBody>
@@ -222,6 +230,8 @@ export default function OrdersDetailedTable() {
           <Button onClick={handleSubmit} color="primary">Submit</Button>
         </DialogActions>
       </Dialog>
+
+      <PrintModal data={printData} onClose={() => setPrintData(null)} />
     </Box>
   );
 }

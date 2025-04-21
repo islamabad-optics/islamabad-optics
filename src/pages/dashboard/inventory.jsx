@@ -1,23 +1,15 @@
 import * as React from 'react';
 import {
-  Box,
-  Tabs,
-  Tab,
-  Typography,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField
+  Box, Tabs, Tab, Typography, Table, TableBody, TableCell, TableContainer,
+  TableHead, TableRow, Paper, Button, Dialog, DialogTitle, DialogContent,
+  DialogActions, TextField, MenuItem, Select, InputLabel, FormControl
 } from '@mui/material';
+import { databases, ID, Query } from '../../utils/appwrite';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
+
+const databaseId = '67fe47260000f251de8f';
+const collectionId = '67ff759e00337dcb0cff';
 
 const tabLabels = [
   'Frame',
@@ -35,60 +27,152 @@ function TabPanel({ value, index, children }) {
 
 export default function InventoryPage() {
   const [tabIndex, setTabIndex] = React.useState(0);
+  const [inventoryData, setInventoryData] = React.useState([]);
+  const [loading, setLoading] = React.useState(false);
 
-  // Track inventory per tab
-  const [inventoryData, setInventoryData] = React.useState(() =>
-    tabLabels.map(() => [
-      { name: 'Item A', price: 100, code: 'FRM001', stock: 20 },
-      { name: 'Item B', price: 150, code: 'FRM002', stock: 12 },
-      { name: 'Item C', price: 200, code: 'FRM003', stock: 5 },
-    ])
-  );
+  const [openModal, setOpenModal] = React.useState(false);
+  const [editMode, setEditMode] = React.useState(false);
+  const [editingItemId, setEditingItemId] = React.useState(null);
 
-  // Modal state
-  const [openAddModal, setOpenAddModal] = React.useState(false);
   const [formValues, setFormValues] = React.useState({
     name: '',
-    price: '',
-    code: '',
-    stock: '',
+    unit_price: '',
+    item_code: '',
+    total_stock_remaining: '',
+    inventory_type: tabLabels[0],
   });
+
+  const fetchInventory = async () => {
+    try {
+      setLoading(true);
+      const res = await databases.listDocuments(databaseId, collectionId, [
+        Query.equal('inventory_type', tabLabels[tabIndex])
+      ]);
+      setInventoryData(res.documents);
+    } catch (err) {
+      console.error('Error fetching inventory:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchInventory();
+  }, [tabIndex]);
 
   const handleTabChange = (event, newValue) => setTabIndex(newValue);
 
-  const handleOpenAddModal = () => setOpenAddModal(true);
-  const handleCloseAddModal = () => {
-    setOpenAddModal(false);
-    setFormValues({ name: '', price: '', code: '', stock: '' }); // reset
+  const handleOpenAddModal = () => {
+    setEditMode(false);
+    setFormValues({
+      name: '',
+      unit_price: '',
+      item_code: '',
+      total_stock_remaining: '',
+      inventory_type: tabLabels[tabIndex],
+    });
+    setOpenModal(true);
+  };
+
+  const handleOpenEditModal = (item) => {
+    setEditMode(true);
+    setEditingItemId(item.$id);
+    setFormValues({
+      name: item.name,
+      unit_price: item.unit_price,
+      item_code: item.item_code,
+      total_stock_remaining: item.total_stock_remaining,
+      inventory_type: item.inventory_type,
+    });
+    setOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+    setEditMode(false);
+    setEditingItemId(null);
+    setFormValues({
+      name: '',
+      unit_price: '',
+      item_code: '',
+      total_stock_remaining: '',
+      inventory_type: tabLabels[tabIndex],
+    });
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormValues(prev => ({ ...prev, [name]: value }));
+    setFormValues((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleAddItem = () => {
-    const { name, price, code, stock } = formValues;
-    if (name && price && code && stock) {
-      const updatedInventory = [...inventoryData];
-      updatedInventory[tabIndex].push({
-        name,
-        price: parseFloat(price),
-        code,
-        stock: parseInt(stock),
-      });
-      setInventoryData(updatedInventory);
-      handleCloseAddModal();
+  const handleSubmit = async () => {
+    const { name, unit_price, item_code, total_stock_remaining, inventory_type } = formValues;
+    if (name && unit_price && item_code && total_stock_remaining && inventory_type) {
+      try {
+        if (editMode) {
+          await databases.updateDocument(databaseId, collectionId, editingItemId, {
+            name,
+            unit_price,
+            item_code,
+            total_stock_remaining,
+            inventory_type,
+          });
+        } else {
+          await databases.createDocument(databaseId, collectionId, ID.unique(), {
+            name,
+            unit_price,
+            item_code,
+            total_stock_remaining,
+            inventory_type,
+          });
+        }
+        fetchInventory();
+        handleCloseModal();
+      } catch (err) {
+        console.error('Error saving item:', err);
+      }
     } else {
       alert('Please fill in all fields.');
     }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await databases.deleteDocument(databaseId, collectionId, id);
+      fetchInventory();
+    } catch (err) {
+      console.error('Error deleting item:', err);
+    }
+  };
+
+  const handleExportToExcel = () => {
+    if (inventoryData.length === 0) {
+      alert("No data to export.");
+      return;
+    }
+
+    const worksheet = XLSX.utils.json_to_sheet(inventoryData.map(item => ({
+      Name: item.name,
+      'Unit Price': item.unit_price,
+      'Item Code': item.item_code,
+      'Total Stock Remaining': item.total_stock_remaining,
+      'Inventory Type': item.inventory_type,
+    })));
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, tabLabels[tabIndex]);
+
+    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const fileName = `${tabLabels[tabIndex].replace(/\s+/g, '_')}_Inventory.xlsx`;
+
+    const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+    saveAs(blob, fileName);
   };
 
   return (
     <Box sx={{ width: '100%', p: 2 }}>
       <Typography variant="h5" gutterBottom>Inventory</Typography>
 
-      {/* Tabs */}
       <Tabs
         value={tabIndex}
         onChange={handleTabChange}
@@ -100,55 +184,67 @@ export default function InventoryPage() {
         ))}
       </Tabs>
 
-      {/* Tab Panels */}
-      {tabLabels.map((label, index) => (
-        <TabPanel key={index} value={tabIndex} index={index}>
-          {/* Add button */}
-          <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 2 }}>
-            <Button variant="contained" color="primary" onClick={handleOpenAddModal}>
-              Add
-            </Button>
-          </Box>
+      <TabPanel value={tabIndex} index={tabIndex}>
+        <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 2, gap: 2 }}>
+          <Button variant="contained" color="primary" onClick={handleOpenAddModal}>
+            Add
+          </Button>
+          <Button variant="outlined" color="secondary" onClick={handleExportToExcel}>
+            Export to Excel
+          </Button>
+        </Box>
 
-          {/* Table */}
-          <TableContainer component={Paper}>
-            <Table size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Price</TableCell>
-                  <TableCell>Code</TableCell>
-                  <TableCell>Total Stock Remaining</TableCell>
-                  <TableCell align="right">Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {inventoryData[index].map((item, idx) => (
-                  <TableRow
-                    key={idx}
-                    sx={{ backgroundColor: idx % 2 === 0 ? 'white' : 'rgba(0,0,0,0.04)' }}
-                  >
+        <TableContainer component={Paper}>
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell>Name</TableCell>
+                <TableCell>Unit Price</TableCell>
+                <TableCell>Item Code</TableCell>
+                <TableCell>Total Stock Remaining</TableCell>
+                <TableCell align="right">Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {loading ? (
+                <TableRow><TableCell colSpan={5}>Loading...</TableCell></TableRow>
+              ) : (
+                inventoryData.map((item) => (
+                  <TableRow key={item.$id}>
                     <TableCell>{item.name}</TableCell>
-                    <TableCell>₹{item.price}</TableCell>
-                    <TableCell>{item.code}</TableCell>
-                    <TableCell>{item.stock}</TableCell>
+                    <TableCell>₹{item.unit_price}</TableCell>
+                    <TableCell>{item.item_code}</TableCell>
+                    <TableCell>{item.total_stock_remaining}</TableCell>
                     <TableCell align="right">
                       <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
-                        <Button size="small" variant="outlined">Edit</Button>
-                        <Button size="small" variant="contained" color="error">Delete</Button>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          onClick={() => handleOpenEditModal(item)}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          size="small"
+                          variant="contained"
+                          color="error"
+                          onClick={() => handleDelete(item.$id)}
+                        >
+                          Delete
+                        </Button>
                       </Box>
                     </TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </TabPanel>
-      ))}
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </TabPanel>
 
-      {/* Add Modal */}
-      <Dialog open={openAddModal} onClose={handleCloseAddModal} fullWidth maxWidth="sm">
-        <DialogTitle>Add New Item</DialogTitle>
+      {/* Add/Edit Modal */}
+      <Dialog open={openModal} onClose={handleCloseModal} fullWidth maxWidth="sm">
+        <DialogTitle>{editMode ? 'Edit Item' : 'Add New Item'}</DialogTitle>
         <DialogContent dividers sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <TextField
             label="Name"
@@ -158,32 +254,50 @@ export default function InventoryPage() {
             fullWidth
           />
           <TextField
-            label="Price"
-            name="price"
+            label="Unit Price"
+            name="unit_price"
             type="number"
-            value={formValues.price}
+            value={formValues.unit_price}
             onChange={handleChange}
             fullWidth
           />
           <TextField
-            label="Code"
-            name="code"
-            value={formValues.code}
+            label="Item Code"
+            name="item_code"
+            value={formValues.item_code}
             onChange={handleChange}
             fullWidth
           />
           <TextField
-            label="Total Stock"
-            name="stock"
+            label="Total Stock Remaining"
+            name="total_stock_remaining"
             type="number"
-            value={formValues.stock}
+            value={formValues.total_stock_remaining}
             onChange={handleChange}
             fullWidth
           />
+          <FormControl fullWidth>
+            <InputLabel id="inventory-type-label">Inventory Type</InputLabel>
+            <Select
+              labelId="inventory-type-label"
+              name="inventory_type"
+              value={formValues.inventory_type}
+              onChange={handleChange}
+              label="Inventory Type"
+            >
+              {tabLabels.map((label) => (
+                <MenuItem key={label} value={label}>
+                  {label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseAddModal}>Cancel</Button>
-          <Button variant="contained" onClick={handleAddItem}>Add</Button>
+          <Button onClick={handleCloseModal}>Cancel</Button>
+          <Button variant="contained" onClick={handleSubmit}>
+            {editMode ? 'Update' : 'Add'}
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>
