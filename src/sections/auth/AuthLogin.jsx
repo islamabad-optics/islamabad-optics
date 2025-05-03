@@ -22,7 +22,7 @@ import * as Yup from 'yup';
 import { Formik } from 'formik';
 import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 
-import { account } from './../../utils/appwrite'; // Appwrite Auth instance
+import { account } from './../../utils/appwrite';
 
 export default function AuthLogin({ isDemo = false }) {
   const [checked, setChecked] = React.useState(false);
@@ -34,7 +34,7 @@ export default function AuthLogin({ isDemo = false }) {
 
   const loginUser = async (email, password) => {
     try {
-      const session = await account.createEmailPasswordSession(email, password);
+      const session = await account.createEmailSession(email, password); // ✅ fixed method
       console.log('Login success:', session);
       navigate('/dashboard/default');
     } catch (error) {
@@ -51,9 +51,7 @@ export default function AuthLogin({ isDemo = false }) {
         submit: null
       }}
       validationSchema={Yup.object().shape({
-        email: Yup.string()
-          .email('Must be a valid email')
-          .required('Email is required'),
+        email: Yup.string().email('Must be a valid email').required('Email is required'),
         password: Yup.string()
           .required('Password is required')
           .max(20, 'Password must be less than 20 characters')
@@ -134,13 +132,7 @@ export default function AuthLogin({ isDemo = false }) {
 
             <Grid item xs={12}>
               <AnimateButton>
-                <Button
-                  fullWidth
-                  size="large"
-                  variant="contained"
-                  color="primary"
-                  type="submit"
-                >
+                <Button fullWidth size="large" variant="contained" color="primary" type="submit">
                   Login
                 </Button>
               </AnimateButton>
