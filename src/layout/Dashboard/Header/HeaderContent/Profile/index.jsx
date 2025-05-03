@@ -29,12 +29,14 @@ import IconButton from 'components/@extended/IconButton';
 
 // Assets
 import avatar1 from 'assets/images/users/avatar-1.png';
+import { useAuth } from '../../../../../contexts/AuthContext';
 
 export default function Profile() {
   const [open, setOpen] = useState(false);
   const anchorRef = useRef(null);
   const navigate = useNavigate();
-
+  const { user } = useAuth();
+console.log("--------->",user.name)
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen);
   };
@@ -68,7 +70,7 @@ export default function Profile() {
       >
         <Stack direction="row" spacing={1.25} alignItems="center" p={0.5}>
           <Avatar alt="profile user" src={avatar1} sx={{ width: 32, height: 32 }} />
-          <Typography variant="subtitle1">John Doe</Typography>
+          <Typography variant="subtitle1">{user?.name}</Typography>
         </Stack>
       </ButtonBase>
 
@@ -90,10 +92,9 @@ export default function Profile() {
                       <Stack direction="row" spacing={1.25} alignItems="center">
                         <Avatar alt="profile user" src={avatar1} sx={{ width: 32, height: 32 }} />
                         <Stack>
-                          <Typography variant="h6">John Doe</Typography>
+                          <Typography variant="h6">{user?.name}</Typography>
                           <Typography variant="body2" color="text.secondary">
-                            UI/UX Designer
-                          </Typography>
+                            {user?.labels[0]}                          </Typography>
                         </Stack>
                       </Stack>
                       <Tooltip title="Logout">

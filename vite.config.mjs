@@ -21,7 +21,6 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: []
     },
-    base: '/',
     plugins: [react(), jsconfigPaths()]
   };
 });

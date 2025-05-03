@@ -127,7 +127,7 @@ export default function OrdersDetailedTable() {
   return (
     <Box sx={{ width: '100%', p: 2 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-        <Typography variant="h6">Customer Orders</Typography>
+        <Typography variant="h6">Sales</Typography>
         <Button variant="contained" color="primary" onClick={() => setOpen(true)}>Add</Button>
       </Box>
 
@@ -189,10 +189,10 @@ export default function OrdersDetailedTable() {
             {Object.entries({
               customer_name: 'Customer Name',
               right_eye_sphere: 'Right Sphere',
-              right_eye_cylinder: 'Right Cylinder',
+              left_eye_cylinder: 'Left Cylinder',
               right_eye_axis: 'Right Axis',
               left_eye_sphere: 'Left Sphere',
-              left_eye_cylinder: 'Left Cylinder',
+              right_eye_cylinder: 'Right Cylinder',
               left_eye_axis: 'Left Axis',
               near_add: 'Near Add',
               total_amount: 'Total Amount',
