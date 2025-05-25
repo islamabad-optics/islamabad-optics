@@ -1,5 +1,14 @@
 // assets
-import { AreaChartOutlined, DashboardOutlined, StockOutlined, UsergroupAddOutlined, UserOutlined } from '@ant-design/icons';
+import { 
+  AreaChartOutlined, 
+  DashboardOutlined, 
+  StockOutlined, 
+  UsergroupAddOutlined, 
+  UserOutlined,
+  ShoppingCartOutlined,
+  BarChartOutlined,
+  PieChartOutlined
+} from '@ant-design/icons';
 
 // icons
 const icons = {
@@ -7,7 +16,10 @@ const icons = {
   UsergroupAddOutlined,
   AreaChartOutlined,
   StockOutlined,
-  UserOutlined
+  UserOutlined,
+  ShoppingCartOutlined,
+  BarChartOutlined,
+  PieChartOutlined
 };
 
 // ==============================|| MENU ITEMS - DASHBOARD ||============================== //
@@ -26,11 +38,11 @@ const dashboard = {
       breadcrumbs: false
     },
     {
-      id: 'customers',
-      title: 'Customers',
+      id: 'analytics',
+      title: 'Analytics',
       type: 'item',
-      url: '/customers',
-      icon: icons.UsergroupAddOutlined,
+      url: '/dashboard/analytics',
+      icon: icons.BarChartOutlined,
       breadcrumbs: false
     },
     {
@@ -38,7 +50,15 @@ const dashboard = {
       title: 'Sales',
       type: 'item',
       url: '/sales',
-      icon: icons.AreaChartOutlined,
+      icon: icons.ShoppingCartOutlined,
+      breadcrumbs: false
+    },
+    {
+      id: 'customers',
+      title: 'Customers',
+      type: 'item',
+      url: '/customers',
+      icon: icons.UsergroupAddOutlined,
       breadcrumbs: false
     },
     {
@@ -49,7 +69,14 @@ const dashboard = {
       icon: icons.StockOutlined,
       breadcrumbs: false
     },
-
+    {
+      id: 'reports',
+      title: 'Reports',
+      type: 'item',
+      url: '/reports',
+      icon: icons.PieChartOutlined,
+      breadcrumbs: false
+    }
   ]
 };
 
