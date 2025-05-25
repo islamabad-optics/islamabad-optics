@@ -37,14 +37,7 @@ const dashboard = {
       icon: icons.DashboardOutlined,
       breadcrumbs: false
     },
-    {
-      id: 'analytics',
-      title: 'Analytics',
-      type: 'item',
-      url: '/dashboard/analytics',
-      icon: icons.BarChartOutlined,
-      breadcrumbs: false
-    },
+
     {
       id: 'sales',
       title: 'Sales',
@@ -69,14 +62,15 @@ const dashboard = {
       icon: icons.StockOutlined,
       breadcrumbs: false
     },
-    {
-      id: 'reports',
-      title: 'Reports',
+
+      {
+      id: 'clpc',
+      title: 'Clpc',
       type: 'item',
-      url: '/reports',
+      url: '/clpc',
       icon: icons.PieChartOutlined,
       breadcrumbs: false
-    }
+    },
   ]
 };
 
