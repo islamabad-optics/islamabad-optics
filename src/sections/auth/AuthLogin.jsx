@@ -34,7 +34,7 @@ export default function AuthLogin({ isDemo = false }) {
 
   const loginUser = async (email, password) => {
     try {
-      const session = await account.createEmailSession(email, password); // ✅ fixed method
+      const session = await account.createEmailPasswordSession(email, password); // ✅ fixed method
       console.log('Login success:', session);
       navigate('/dashboard/default');
     } catch (error) {
